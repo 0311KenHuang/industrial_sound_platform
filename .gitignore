@@ -1,0 +1,6 @@
+# Python 缓存(可再生成)
+__pycache__/
+*.py[cod]
+
+# 本地上传文件(目录会由程序自动创建)
+data/uploads/

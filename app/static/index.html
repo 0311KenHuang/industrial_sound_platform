@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>声网先知 · 工业设备声纹预测性维护系统</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles-extra.css" />
+  <link rel="stylesheet" href="/static/styles-tables.css" />
+  <link rel="stylesheet" href="/static/styles-visuals.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand"><div class="brand-mark logo-mark"><img src="/static/soundnet-logo.jpg" alt="声网先知 logo" /></div><div><strong>声网先知</strong><small>INDUSTRIAL INTELLIGENCE</small></div></div>
+      <div class="nav-label">工作台</div>
+      <nav id="primary-nav">
+        <a class="active" href="#overview" data-view="overview" aria-current="page"><span>⌂</span> 总览</a>
+        <a href="#devices" data-view="devices"><span>◈</span> 设备声纹</a>
+        <a href="#diagnosis" data-view="diagnosis"><span>⌁</span> 智能诊断</a>
+        <a href="#alerts" data-view="alerts"><span>!</span> 告警中心 <i id="alert-badge">0</i></a>
+        <a href="#orders" data-view="orders"><span>✓</span> 工单管理</a>
+        <a href="#maintainers" data-view="maintainers"><span>♙</span> 维检人员</a>
+      </nav>
+      <div class="sidebar-bottom"><div class="status-dot"></div><div><small>LOCAL ENGINE</small><strong>离线引擎已就绪</strong></div></div>
+    </aside>
+    <div id="mobile-nav-scrim" class="mobile-nav-scrim hidden" aria-hidden="true"></div>
+
+    <main class="main">
+      <header class="topbar"><div class="topbar-heading"><button type="button" id="mobile-nav-toggle" class="mobile-nav-toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="打开导航">☰</button><div><div class="eyebrow">OPERATIONS / SOUNDNET PROPHET</div><h1 id="page-title">工业声纹监控台</h1></div></div><div class="top-actions"><span class="last-sync"><i id="sync-indicator">●</i> <span id="sync-label">正在同步</span></span><button id="train-btn" class="ghost-button">重新训练模型</button><div class="avatar">黄</div></div></header>
+
+      <section id="view-overview" class="content view active">
+        <div class="hero-row"><div><p class="muted"><span id="today-label">正在读取日期…</span></p><h2><span id="greeting-label">早上好</span>，黄钟琦</h2><p class="muted">当前有 <b id="open-alert-count">0</b> 个活跃告警需要关注。</p></div><button class="primary-button" data-go="diagnosis"><span>＋</span> 发起声纹诊断</button></div>
+        <div class="metrics-grid"><div class="metric-card"><div class="metric-head"><span>监测设备</span><span class="metric-icon blue">◈</span></div><strong id="device-count">—</strong><small><b class="green-text">● 在线</b> <span id="online-count">—</span> 台</small></div><div class="metric-card"><div class="metric-head"><span>今日诊断</span><span class="metric-icon purple">⌁</span></div><strong id="diagnosis-count">—</strong><small>同步写入诊断历史</small></div><div class="metric-card"><div class="metric-head"><span>活跃告警</span><span class="metric-icon orange">!</span></div><strong id="alert-count">—</strong><small><b class="orange-text">需要关注</b> 的设备</small></div><div class="metric-card"><div class="metric-head"><span>待处理工单</span><span class="metric-icon green">✓</span></div><strong id="order-count">—</strong><small id="model-detail">状态流转可追踪</small></div></div>
+        <div class="panel-grid"><section class="panel"><div class="panel-title"><div><h3>设备健康概览</h3><p>基于最近一次声纹诊断结果</p></div><a href="#devices" data-go="devices">设备管理 →</a></div><div id="device-list" class="device-list"></div></section><section class="panel trend-panel"><div class="panel-title"><div><h3>诊断趋势</h3><p>过去 7 天 · 异常声纹占比</p></div><span class="legend"><i></i>异常率</span></div><div class="chart"><div class="chart-y"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div><div class="bars" id="trend-bars"></div></div></section></div>
+        <div class="analysis-grid"><section class="panel"><div class="panel-title"><div><h3>设备状态分布</h3><p>当前全局健康度</p></div></div><div id="health-distribution" class="distribution-list"></div></section><section class="panel"><div class="panel-title"><div><h3>故障类型分布</h3><p>累计诊断结果</p></div></div><div id="fault-distribution" class="distribution-list"></div></section><section class="panel"><div class="panel-title"><div><h3>告警级别分布</h3><p>累计告警级别</p></div></div><div id="level-distribution" class="distribution-list"></div></section></div>
+        <div class="panel lower-panel"><div class="panel-title"><div><h3>最新告警</h3><p>需要现场确认的异常事件</p></div><a href="#alerts" data-go="alerts">告警中心 →</a></div><div id="alert-list" class="alert-list"></div></div>
+      </section>
+
+      <section id="view-devices" class="content view">
+        <div class="page-heading"><div><div class="eyebrow">ASSET REGISTRY</div><h2>设备声纹档案</h2><p class="muted">管理风场、风机编号、额定参数与健康状态。</p></div><button class="primary-button" id="add-device-btn">＋ 新增设备</button></div>
+        <div class="filter-bar"><input id="device-search" placeholder="搜索设备编号、名称或地点" /><select id="device-status-filter"><option value="">全部状态</option><option value="online">正常</option><option value="warning">关注</option><option value="offline">离线</option></select><button class="ghost-button" id="device-filter-btn">筛选</button></div>
+        <div class="panel table-panel"><div class="table-wrap"><table class="data-table devices-data-table"><thead><tr><th>设备</th><th>风场 / 地点</th><th>机型 / 额定功率</th><th>健康度</th><th>最近上报</th><th>操作</th></tr></thead><tbody id="devices-table"></tbody></table></div></div>
+        <div id="device-detail-panel" class="panel detail-panel hidden"></div>
+      </section>
+
+      <section id="view-diagnosis" class="content view">
+        <div class="page-heading"><div><div class="eyebrow">DIAGNOSTIC LAB</div><h2>智能声纹诊断</h2><p class="muted">支持程序合成演示、WAV 上传和边缘盒子接口上报。</p></div><span class="engine-badge">● 本地同步推理</span></div>
+        <div id="recheck-context" class="recheck-context hidden"></div><div class="diagnosis-box"><div class="form-row"><label>选择设备<select id="device-select"></select></label><label>演示场景<select id="fault-select"><option value="auto">按设备预设场景</option><option value="normal">正常</option><option value="bearing_wear">轴承磨损</option><option value="bearing_outer">轴承外圈故障</option><option value="bearing_inner">轴承内圈故障</option><option value="imbalance">转子不平衡</option><option value="misalignment">转子不对中</option><option value="gear_fault">齿轮啮合异常</option><option value="gear_broken">齿轮断齿</option><option value="looseness">机械松动</option><option value="generator_fault">发电机异常</option><option value="yaw_fault">偏航系统异常</option><option value="shaft_fault">主轴异常</option></select></label><label class="short-field">采集通道<input id="channel-input" type="number" min="1" max="8" value="1" /></label><button id="simulate-btn" class="primary-button">生成合成声纹并诊断</button></div><div class="upload-row"><label class="upload-button">上传 WAV / MP3<input id="audio-file" type="file" accept="audio/wav,audio/mpeg,.wav,.mp3" /></label><label class="remark-field">备注<input id="remark-input" placeholder="如：月度巡检 / 高风速工况" /></label><span>单文件 ≤ 50MB · WAV 无需额外转码</span></div></div>
+        <div class="diagnostic-visuals"><section class="signal-card"><div class="visual-title"><span>TIME DOMAIN / 原始声纹</span><small><span id="signal-duration">10.0</span> s · <span id="signal-channel">CH-01</span></small></div><svg viewBox="0 0 900 180" preserveAspectRatio="none" aria-label="声纹波形"><path id="waveform-path" d="M0,90 C18,86 22,93 35,90 S55,90 67,89 S85,70 96,91 S110,100 122,87 S145,35 158,89 S177,125 190,88 S210,70 224,93 S244,143 258,90 S278,24 292,89 S312,128 327,88 S348,57 360,92 S380,149 395,90 S415,30 430,90 S450,125 467,89 S488,53 502,92 S522,147 537,89 S558,25 574,90 S596,126 612,90 S630,63 646,91 S666,140 682,90 S704,32 720,90 S742,119 758,90 S778,62 794,90 S812,132 828,90 S850,45 866,90 S886,84 900,90" /></svg></section><section class="signal-card spectrum-card"><div class="visual-title"><span>FREQUENCY / 频谱能量</span><small>0 — 8 kHz</small></div><div id="spectrum-bars" class="spectrum-bars"><i style="height:24%"></i><i style="height:48%"></i><i style="height:32%"></i><i style="height:73%"></i><i style="height:45%"></i><i style="height:89%"></i><i style="height:38%"></i><i style="height:64%"></i><i style="height:29%"></i><i style="height:76%"></i><i style="height:52%"></i><i style="height:36%"></i><i style="height:67%"></i><i style="height:42%"></i><i style="height:58%"></i><i style="height:28%"></i><i style="height:46%"></i><i style="height:35%"></i><i style="height:61%"></i><i style="height:25%"></i></div></section></div>
+        <div id="result-card" class="result-card hidden"></div>
+        <div class="panel lower-panel"><div class="panel-title"><div><h3>诊断历史</h3><p>按设备和故障类型查询，支持查看报告</p></div><div class="inline-filters"><select id="history-device-filter"><option value="">全部设备</option></select><select id="history-fault-filter"><option value="">全部故障</option></select><button class="ghost-button" id="history-filter-btn">查询</button></div></div><div class="table-wrap"><table class="data-table diagnosis-data-table"><thead><tr><th>时间</th><th>设备</th><th>诊断结论</th><th>置信度</th><th>严重程度</th><th>模型</th><th>报告</th></tr></thead><tbody id="diagnosis-table"></tbody></table></div></div>
+      </section>
+
+      <section id="view-alerts" class="content view">
+        <div class="page-heading"><div><div class="eyebrow">ALERT CENTER</div><h2>告警中心</h2><p class="muted">处理异常声纹，记录确认备注，并一键转成检修工单。</p></div><div class="alert-summary"><b id="alert-total-label">0</b><span>条告警</span></div></div>
+        <div class="filter-bar"><select id="alert-status-filter"><option value="">全部状态</option><option value="未处理">未处理</option><option value="处理中">处理中</option><option value="已关闭">已关闭</option></select><select id="alert-level-filter"><option value="">全部级别</option><option value="严重">严重</option><option value="警告">警告</option><option value="提示">提示</option></select><button class="ghost-button" id="alert-filter-btn">筛选告警</button></div>
+        <div class="panel table-panel"><div class="table-wrap"><table class="data-table alerts-data-table"><thead><tr><th>告警编号</th><th>告警事件</th><th>设备 / 风场</th><th>级别</th><th>状态</th><th>触发时间</th><th>处理</th></tr></thead><tbody id="alerts-table"></tbody></table></div></div>
+      </section>
+
+      <section id="view-maintainers" class="content view">
+        <div class="page-heading"><div><div class="eyebrow">MAINTAINER DIRECTORY</div><h2>维检人员</h2><p class="muted">维护通讯录并管理工单短信通知的收件人。手机号仅显示脱敏结果。</p></div><button class="primary-button" id="add-maintainer-btn">＋ 新增维检人员</button></div>
+        <div class="filter-bar"><input id="maintainer-search" placeholder="搜索姓名或班组" /><button class="ghost-button" id="maintainer-filter-btn">筛选人员</button></div>
+        <div class="panel table-panel"><div class="table-wrap"><table class="data-table maintainers-data-table"><thead><tr><th>姓名</th><th>手机号</th><th>班组</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody id="maintainers-table"></tbody></table></div></div>
+      </section>
+
+      <section id="view-orders" class="content view">
+        <div class="page-heading"><div><div class="eyebrow">MAINTENANCE WORKFLOW</div><h2>运维工单</h2><p class="muted">从告警到派工、处理、验收和关闭，全程留下操作时间线。</p></div><button class="primary-button" id="manual-order-btn">＋ 手动创建工单</button></div>
+        <div class="filter-bar"><select id="order-status-filter"><option value="">全部状态</option><option value="待分配">待分配</option><option value="处理中">处理中</option><option value="已完成">已完成</option><option value="已关闭">已关闭</option></select><select id="order-priority-filter"><option value="">全部优先级</option><option value="紧急">紧急</option><option value="高">高</option><option value="中">中</option><option value="低">低</option></select><button class="ghost-button" id="order-filter-btn">筛选工单</button></div>
+        <div class="panel table-panel"><div class="table-wrap"><table class="data-table orders-data-table"><thead><tr><th>工单编号</th><th>故障描述</th><th>设备</th><th>优先级</th><th>负责人</th><th>状态</th><th>操作</th></tr></thead><tbody id="orders-table"></tbody></table></div></div>
+        <div id="order-detail-panel" class="panel detail-panel hidden"></div>
+      </section>
+    </main>
+  </div>
+  <div id="auth-gate" class="auth-gate">
+    <div class="auth-card">
+      <div class="eyebrow">SECURE ACCESS / 声网先知</div>
+      <h2>登录监控台</h2>
+      <p class="muted">登录后才能访问设备、诊断、告警和工单数据。</p>
+      <form id="login-form" class="auth-form">
+        <label>用户名<input id="login-username" name="username" required autocomplete="username" value="admin" /></label>
+        <label>密码<input name="password" type="password" required autocomplete="current-password" placeholder="请输入密码" /></label>
+        <button class="primary-button" type="submit">登录监控台</button>
+        <p id="auth-message" class="auth-message" role="alert">默认演示账号：admin / admin123</p>
+      </form>
+    </div>
+  </div>
+  <div id="device-modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3 id="device-modal-title">新增设备</h3><button data-close-modal="device-modal">×</button></div><form id="device-form"><div class="form-grid"><label>设备编号<input name="id" required placeholder="SC-AB-001" /></label><label>设备名称<input name="name" required placeholder="阿坝某风场 01 号风机" /></label><label>风场名称<input name="wind_farm" placeholder="公开项目名称" /></label><label>设备类型<select name="device_type"><option>风电机组</option><option>电机</option><option>齿轮箱</option><option>泵</option><option>风机</option></select></label><label>省份<input name="province" value="四川省" /></label><label>州/市<input name="city" placeholder="阿坝州 / 凉山州" /></label><label>县<input name="county" placeholder="昭觉县" /></label><label>型号<input name="model" placeholder="机型型号" /></label><label>区域<input name="line" placeholder="A 区" /></label><label>安装位置<input name="location" required placeholder="四川省阿坝州某县" /></label><label>投运日期<input name="install_date" type="date" /></label><label>额定功率 kW<input name="rated_power_kw" type="number" min="0" /></label><label>轮毂高度 m<input name="hub_height_m" type="number" min="0" /></label><label>叶轮直径 m<input name="rotor_diameter_m" type="number" min="0" /></label></div><div class="modal-actions"><button type="button" class="ghost-button" data-close-modal="device-modal">取消</button><button class="primary-button">保存设备档案</button></div></form></div></div>
+  <div id="order-modal" class="modal hidden"><div class="modal-card compact-modal"><div class="modal-head"><h3>手动创建工单</h3><button data-close-modal="order-modal">×</button></div><form id="order-form"><div class="form-grid"><label>关联设备<select id="manual-order-device" name="device_id" required></select></label><label>优先级<select name="priority"><option>高</option><option>紧急</option><option>中</option><option>低</option></select></label><label>维检负责人<select id="manual-order-assignee" name="assignee_id"><option value="">待分配</option></select></label><label class="full-field">工单标题<input name="title" required placeholder="如：风机例行巡检" /></label><label class="full-field">问题描述<textarea name="description" rows="4" placeholder="填写需要处理的现象和范围"></textarea></label></div><div class="modal-actions"><button type="button" class="ghost-button" data-close-modal="order-modal">取消</button><button class="primary-button">创建工单</button></div></form></div></div>
+  <div id="maintainer-modal" class="modal hidden"><div class="modal-card compact-modal"><div class="modal-head"><h3 id="maintainer-modal-title">新增维检人员</h3><button data-close-modal="maintainer-modal">×</button></div><form id="maintainer-form"><div class="form-grid"><label>姓名<input name="name" required maxlength="80" placeholder="如：张师傅" /></label><label>手机号<input name="phone" required inputmode="tel" placeholder="13800000001" /></label><label class="full-field">班组<input name="team" maxlength="120" placeholder="如：风场检修一组" /></label></div><p class="muted form-hint">仅接受中国大陆 11 位手机号；页面不会展示完整号码。</p><div class="modal-actions"><button type="button" class="ghost-button" data-close-modal="maintainer-modal">取消</button><button class="primary-button">保存人员</button></div></form></div></div>
+  <div id="toast" class="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
